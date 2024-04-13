@@ -31,7 +31,7 @@ def summarize_script(file_path):
     return full_summary
 
 # 추후 DB에서 가져오도록 수정
-# 일단 뉴스기사로 테스트
+# 뉴스기사로 테스트
 file_path = "news.txt"
 
 summary = summarize_script(file_path)
