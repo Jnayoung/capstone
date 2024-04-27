@@ -10505,6 +10505,7 @@ strip-json-comments@^3.0.1:
   version "3.1.1"
   resolved "https://registry.npmjs.org/strip-json-comments/-/strip-json-comments-3.1.1.tgz"
   integrity sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==
+<<<<<<< HEAD
 
 stt.js@^0.9.2:
   version "0.9.2"
@@ -10512,6 +10513,8 @@ stt.js@^0.9.2:
   integrity sha512-/4b3nntb9xuIaAUwd3JVS3eTlhwzcfkZ0iJoYmvCfTEXNnW0OsqpdRq9pBfyGvyp3HHEO+DpdgGYy85BlgiYPQ==
   dependencies:
     mitt "^2.1.0"
+=======
+>>>>>>> 18bd46063333a792e885b1a9b591c6cf8292fa9b
 
 style-loader@0.23.1:
   version "0.23.1"
@@ -10881,11 +10884,14 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.npmjs.org/typedarray/-/typedarray-0.0.6.tgz"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
+<<<<<<< HEAD
 
 typescript@^3.2.1, "typescript@>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta":
   version "3.9.10"
   resolved "https://registry.npmjs.org/typescript/-/typescript-3.9.10.tgz"
   integrity sha512-w6fIxVE/H1PkLKcCPsFqKE7Kv7QUwhU8qQY2MueZXWx5cPZdwFupLgKK3vntcK98BtNHZtAF4LA/yl2a7k8R6Q==
+=======
+>>>>>>> 18bd46063333a792e885b1a9b591c6cf8292fa9b
 
 unicode-canonical-property-names-ecmascript@^1.0.4:
   version "1.0.4"
