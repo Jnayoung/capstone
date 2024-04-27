@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import socket from '../../socket';
 
-const Chat = ({ display, roomId }) => {
+const Subtitle = ({ display, roomId }) => {
   const currentUser = sessionStorage.getItem('user');
   const [msg, setMsg] = useState([]);
   const messagesEndRef = useRef(null);
@@ -34,7 +34,7 @@ const Chat = ({ display, roomId }) => {
 
   return (
     <ChatContainer className={display ? '' : 'width0'}>
-      <TopHeader>Group Chat Room</TopHeader>
+      <TopHeader>STT Subtitle</TopHeader>
       <ChatArea>
         <MessageList>
           {msg &&
@@ -58,11 +58,6 @@ const Chat = ({ display, roomId }) => {
           <div style={{ float: 'left', clear: 'both' }} ref={messagesEndRef} />
         </MessageList>
       </ChatArea>
-      <BottomInput
-        ref={inputRef}
-        onKeyUp={sendMessage}
-        placeholder="Enter your message"
-      />
     </ChatContainer>
   );
 };
@@ -72,7 +67,7 @@ const ChatContainer = styled.div`
   flex-direction: column;
   width: 25%;
   hieght: 100%;
-  background-color: white;
+  background-color: #D9FFFE;
   transition: all 0.5s ease;
   overflow: hidden;
 `;
@@ -155,18 +150,4 @@ const UserMessage = styled.div`
   }
 `;
 
-const BottomInput = styled.input`
-  bottom: 0;
-  width: 100%;
-  height: 8%;
-  padding: 15px;
-  border-top: 1px solid rgb(69, 69, 82, 0.25);
-  box-sizing: border-box;
-  opacity: 0.7;
-
-  :focus {
-    outline: none;
-  }
-`;
-
-export default Chat;
+export default Subtitle;

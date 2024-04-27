@@ -5,6 +5,7 @@ import socket from '../../socket';
 import VideoCard from '../Video/VideoCard';
 import BottomBar from '../BottomBar/BottomBar';
 import Chat from '../Chat/Chat';
+import Subtitle from '../Subtitle/Subtitle';
 
 const Room = (props) => {
   const currentUser = sessionStorage.getItem('user');
@@ -14,6 +15,7 @@ const Room = (props) => {
   });
   const [videoDevices, setVideoDevices] = useState([]);
   const [displayChat, setDisplayChat] = useState(false);
+  const [displaySub, setDisplaySub] = useState(false);
   const [screenShare, setScreenShare] = useState(false);
   const [showVideoDevices, setShowVideoDevices] = useState(false);
   const peersRef = useRef([]);
@@ -109,7 +111,7 @@ const Room = (props) => {
             users = users.filter((user) => user.peerID !== peerIdx.peer.peerID);
             return [...users];
           });
-          peersRef.current = peersRef.current.filter(({ peerID }) => peerID !== userId );
+          peersRef.current = peersRef.current.filter(({ peerID }) => peerID !== userId);
         });
       });
 
@@ -209,12 +211,18 @@ const Room = (props) => {
     setDisplayChat(!displayChat);
   };
 
+  // Open Subtitle
+  const clickSubtitle = (e) => {
+    e.stopPropagation();
+    setDisplaySub(!displaySub);
+  };
+
   // BackButton
   const goToBack = (e) => {
     e.preventDefault();
     socket.emit('BE-leave-room', { roomId, leaver: currentUser });
     sessionStorage.removeItem('user');
-    window.location.href = '/';
+    window.location.href = `result/${roomId}`;
   };
 
   const toggleCameraAudio = (e) => {
@@ -368,6 +376,7 @@ const Room = (props) => {
         <BottomBar
           clickScreenSharing={clickScreenSharing}
           clickChat={clickChat}
+          clickSubtitle={clickSubtitle}
           clickCameraDevice={clickCameraDevice}
           goToBack={goToBack}
           toggleCameraAudio={toggleCameraAudio}
@@ -379,6 +388,7 @@ const Room = (props) => {
         />
       </VideoAndBarContainer>
       <Chat display={displayChat} roomId={roomId} />
+      <Subtitle display={displaySub} roomId={roomId} />
     </RoomContainer>
   );
 };

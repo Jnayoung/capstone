@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 const BottomBar = ({
   clickChat,
+  clickSubtitle,
   clickCameraDevice,
   goToBack,
   toggleCameraAudio,
@@ -57,12 +58,6 @@ const BottomBar = ({
         </CameraButton>
       </Left>
       <Center>
-        <ChatButton onClick={clickChat}>
-          <div>
-            <FaIcon className='fas fa-comments'></FaIcon>
-          </div>
-          Chat
-        </ChatButton>
         <ScreenButton onClick={clickScreenSharing}>
           <div>
             <FaIcon
@@ -71,6 +66,18 @@ const BottomBar = ({
           </div>
           Share Screen
         </ScreenButton>
+        <ChatButton onClick={clickChat}>
+          <div>
+            <FaIcon className='fas fa-comments'></FaIcon>
+          </div>
+          Chat
+        </ChatButton>
+        <SubtitleButton onClick={clickSubtitle}>
+          <div>
+            <FaIcon className='fas fa-comments'></FaIcon>
+          </div>
+          Subtitle
+        </SubtitleButton>
       </Center>
       <Right>
         <StopButton onClick={goToBack}>Stop</StopButton>
@@ -107,6 +114,23 @@ const Center = styled.div`
 const Right = styled.div``;
 
 const ChatButton = styled.div`
+  width: 75px;
+  border: none;
+  font-size: 0.9375rem;
+  padding: 5px;
+
+  :hover {
+    background-color: #77b7dd;
+    cursor: pointer;
+    border-radius: 15px;
+  }
+
+  * {
+    pointer-events: none;
+  }
+`;
+
+const SubtitleButton = styled.div`
   width: 75px;
   border: none;
   font-size: 0.9375rem;

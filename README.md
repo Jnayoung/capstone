@@ -13,7 +13,7 @@ This project is **deployed** at: https://video-group-meeting.herokuapp.com/
 - [Syled-components](https://styled-components.com/)
 - [Simple-peer](https://github.com/feross/simple-peer)
 
-**Contributors:** [Hyunse Kim](https://github.com/Hyunse)
+<!-- **Contributors:** [Hyunse Kim](https://github.com/Hyunse) -->
 
 ---
 
@@ -51,6 +51,14 @@ This project is **deployed** at: https://video-group-meeting.herokuapp.com/
     
     /* Run */
     npm run dev
+  </code>
+</pre>
+
+**ngrok**
+<pre>
+  <code>
+    /* Run */
+    ngrok http 3000 --host-header="localhost:3000"
   </code>
 </pre>
 
