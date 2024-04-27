@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import Peer from 'simple-peer';
 import styled from 'styled-components';
 import socket from '../../socket';
+import STT from 'stt.js';
 import VideoCard from '../Video/VideoCard';
 import BottomBar from '../BottomBar/BottomBar';
 import Chat from '../Chat/Chat';
-import Subtitle from '../Subtitle/Subtitle';
 
 const Room = (props) => {
   const currentUser = sessionStorage.getItem('user');
@@ -68,9 +68,13 @@ const Room = (props) => {
                 };
               });
             }
+
+            bindSttEvents();
+            stt.onStart();
           });
 
           setPeers(peers);
+
         });
 
         socket.on('FE-receive-call', ({ signal, from, info }) => {
@@ -137,6 +141,49 @@ const Room = (props) => {
     };
     // eslint-disable-next-line
   }, []);
+
+  // ==============================STT=======================================
+  const stt = new STT({
+    continuous: true,
+    interimResults: true,
+  });
+
+  function bindSttEvents() {
+    stt.on('start', () => {
+      console.log('start :>> ');
+      //$btnMic.classList.replace('off', 'on');
+    });
+
+    stt.on('end', () => {
+      console.log('end :>> ');
+      //$btnMic.classList.replace('on', 'off');
+    });
+
+    stt.on('result', ({ finalTranscript, interimTranscript }) => {
+      console.log('result :>> ', finalTranscript, interimTranscript);
+      const textspace = document.getElementsByClassName("subtitle");
+      textspace.innerText = interimTranscript;
+      console.log(stt.getIsRecognizing());
+      //socket.emit('stt-data', { roomId, userName: currentUser, interimTranscript });
+
+    });
+
+    // no-speech|audio-capture|not-allowed|not-supported-browser
+    stt.on('error', (error) => {
+      console.log('error :>> ', error);
+      //$btnMic.classList.replace('on', 'off');
+
+      switch (error) {
+        case 'not-allowed':
+          alert('마이크 권한이 필요합니다.');
+          break;
+        default:
+          alert(error);
+      }
+    });
+  }
+
+  // ==============================STT=======================================
 
   function createPeer(userId, caller, stream) {
     const peer = new Peer({
@@ -231,12 +278,14 @@ const Room = (props) => {
     setUserVideoAudio((preList) => {
       let videoSwitch = preList['localUser'].video;
       let audioSwitch = preList['localUser'].audio;
+      //console.log(audioSwitch);
 
       if (target === 'video') {
         const userVideoTrack = userVideoRef.current.srcObject.getVideoTracks()[0];
         videoSwitch = !videoSwitch;
         userVideoTrack.enabled = videoSwitch;
       } else {
+        console.log(userVideoRef.current.srcObject.getAudioTracks()[0]);
         const userAudioTrack = userVideoRef.current.srcObject.getAudioTracks()[0];
         audioSwitch = !audioSwitch;
 
@@ -252,7 +301,7 @@ const Room = (props) => {
         localUser: { video: videoSwitch, audio: audioSwitch },
       };
     });
-
+    stt[stt.getIsRecognizing() ? 'stop' : 'start']();
     socket.emit('BE-toggle-camera-audio', { roomId, switchTarget: target });
   };
 
@@ -372,7 +421,14 @@ const Room = (props) => {
           {/* Joined User Vidoe */}
           {peers &&
             peers.map((peer, index, arr) => createUserVideo(peer, index, arr))}
+          <Subtitle>
+            <Message>
+              <strong className='userName'></strong>
+              <p className='subtitle'></p>
+            </Message>
+          </Subtitle>
         </VideoContainer>
+
         <BottomBar
           clickScreenSharing={clickScreenSharing}
           clickChat={clickChat}
@@ -388,7 +444,6 @@ const Room = (props) => {
         />
       </VideoAndBarContainer>
       <Chat display={displayChat} roomId={roomId} />
-      <Subtitle display={displaySub} roomId={roomId} />
     </RoomContainer>
   );
 };
@@ -402,20 +457,24 @@ const RoomContainer = styled.div`
 
 const VideoContainer = styled.div`
   max-width: 100%;
+  width: 100vw;
   height: 92%;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-around;
   flex-wrap: wrap;
   align-items: center;
-  padding: 15px;
+  padding: 5px;
+  gap: 5px;
   box-sizing: border-box;
   gap: 10px;
 `;
 
 const VideoAndBarContainer = styled.div`
-  position: relative;
+  position: flex;
+  flex-direction: column;
   width: 100%;
+  gap: 10px;
   height: 100vh;
 `;
 
@@ -437,6 +496,38 @@ const VideoBox = styled.div`
     > i {
       display: block;
     }
+  }
+`;
+
+const Subtitle = styled.div`
+  width: 100%;
+  color: #454552;
+`;
+
+const Message = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  font-size: 16px;
+  margin-top: 15px;
+  text-align: right;
+
+  > strong {
+    margin-right: 35px;
+  }
+
+  > p {
+    max-width: 65%;
+    width: auto;
+    padding: 9px;
+    margin-top: 3px;
+    margin-right: 30px;
+    border: 1px solid rgb(78, 161, 211, 0.3);
+    border-radius: 15px;
+    background-color: #4ea1d3;
+    color: white;
+    font-size: 14px;
+    text-align: left;
   }
 `;
 
