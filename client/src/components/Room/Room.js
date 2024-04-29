@@ -69,7 +69,7 @@ const Room = (props) => {
               });
             }
 
-            bindSttEvents();
+            //bindSttEvents();
             stt.onStart();
           });
 
@@ -141,49 +141,6 @@ const Room = (props) => {
     };
     // eslint-disable-next-line
   }, []);
-
-  // ==============================STT=======================================
-  const stt = new STT({
-    continuous: true,
-    interimResults: true,
-  });
-
-  function bindSttEvents() {
-    stt.on('start', () => {
-      console.log('start :>> ');
-      //$btnMic.classList.replace('off', 'on');
-    });
-
-    stt.on('end', () => {
-      console.log('end :>> ');
-      //$btnMic.classList.replace('on', 'off');
-    });
-
-    stt.on('result', ({ finalTranscript, interimTranscript }) => {
-      console.log('result :>> ', finalTranscript, interimTranscript);
-      const textspace = document.getElementsByClassName("subtitle");
-      textspace.innerText = interimTranscript;
-      console.log(stt.getIsRecognizing());
-      //socket.emit('stt-data', { roomId, userName: currentUser, interimTranscript });
-
-    });
-
-    // no-speech|audio-capture|not-allowed|not-supported-browser
-    stt.on('error', (error) => {
-      console.log('error :>> ', error);
-      //$btnMic.classList.replace('on', 'off');
-
-      switch (error) {
-        case 'not-allowed':
-          alert('마이크 권한이 필요합니다.');
-          break;
-        default:
-          alert(error);
-      }
-    });
-  }
-
-  // ==============================STT=======================================
 
   function createPeer(userId, caller, stream) {
     const peer = new Peer({
@@ -272,6 +229,48 @@ const Room = (props) => {
     window.location.href = `result/${roomId}`;
   };
 
+  // ==============================STT=======================================
+  const stt = new STT({
+    continuous: true,
+    interimResults: true,
+  });
+
+  stt.on('start', () => {
+    console.log('start :>> ');
+    //$btnMic.classList.replace('off', 'on');
+  });
+
+  stt.on('end', () => {
+    console.log('end :>> ');
+    //$btnMic.classList.replace('on', 'off');
+  });
+
+  const [finalScript, setFinalScript] = useState('');
+  const [interimScript, setinterimScript] = useState('');
+  stt.on('result', ({ finalTranscript, interimTranscript }) => {
+    console.log('result :>> ', finalTranscript, interimTranscript);
+    setinterimScript(interimTranscript);
+    setFinalScript(finalTranscript);
+    socket.emit('BE-stt-data-out', { userName: currentUser, data: finalScript });
+  });
+
+  // no-speech|audio-capture|not-allowed|not-supported-browser
+  stt.on('error', (error) => {
+    console.log('error :>> ', error);
+    //$btnMic.classList.replace('on', 'off');
+
+    switch (error) {
+      case 'not-allowed':
+        alert('마이크 권한이 필요합니다.');
+        break;
+      default:
+        alert(error);
+    }
+  });
+
+
+  // ==============================STT=======================================
+
   const toggleCameraAudio = (e) => {
     const target = e.target.getAttribute('data-switch');
 
@@ -285,7 +284,6 @@ const Room = (props) => {
         videoSwitch = !videoSwitch;
         userVideoTrack.enabled = videoSwitch;
       } else {
-        console.log(userVideoRef.current.srcObject.getAudioTracks()[0]);
         const userAudioTrack = userVideoRef.current.srcObject.getAudioTracks()[0];
         audioSwitch = !audioSwitch;
 
@@ -422,10 +420,8 @@ const Room = (props) => {
           {peers &&
             peers.map((peer, index, arr) => createUserVideo(peer, index, arr))}
           <Subtitle>
-            <Message>
-              <strong className='userName'></strong>
-              <p className='subtitle'></p>
-            </Message>
+            <strong>{currentUser}</strong>
+            <p>{interimScript}</p>
           </Subtitle>
         </VideoContainer>
 
@@ -500,32 +496,22 @@ const VideoBox = styled.div`
 `;
 
 const Subtitle = styled.div`
-  width: 100%;
-  color: #454552;
-`;
-
-const Message = styled.div`
+  width: 80%;
+  color: #d7d7d7;
+  background-color: gray;
   display: flex;
   justify-content: center;
   width: 100%;
   font-size: 16px;
   margin-top: 15px;
   text-align: right;
-
-  > strong {
-    margin-right: 35px;
-  }
+  gap: 20px;
 
   > p {
     max-width: 65%;
     width: auto;
     padding: 9px;
-    margin-top: 3px;
-    margin-right: 30px;
-    border: 1px solid rgb(78, 161, 211, 0.3);
-    border-radius: 15px;
-    background-color: #4ea1d3;
-    color: white;
+    color: #d7d7d7;
     font-size: 14px;
     text-align: left;
   }
