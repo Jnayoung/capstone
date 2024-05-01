@@ -6,6 +6,7 @@ import STT from 'stt.js';
 import VideoCard from '../Video/VideoCard';
 import BottomBar from '../BottomBar/BottomBar';
 import Chat from '../Chat/Chat';
+import Subtitle from '../Subtitle/Subtitle';
 
 const Room = (props) => {
   const currentUser = sessionStorage.getItem('user');
@@ -13,6 +14,7 @@ const Room = (props) => {
   const [userVideoAudio, setUserVideoAudio] = useState({
     localUser: { video: true, audio: true },
   });
+  const [sender, setSender] = useState('anonymous');
   const [videoDevices, setVideoDevices] = useState([]);
   const [displayChat, setDisplayChat] = useState(false);
   const [displaySub, setDisplaySub] = useState(false);
@@ -249,10 +251,16 @@ const Room = (props) => {
   const [interimScript, setinterimScript] = useState('');
   stt.on('result', ({ finalTranscript, interimTranscript }) => {
     console.log('result :>> ', finalTranscript, interimTranscript);
+    setSender(currentUser);
     setinterimScript(interimTranscript);
     setFinalScript(finalTranscript);
     socket.emit('BE-stt-data-out', { userName: currentUser, data: finalScript });
   });
+
+  socket.on("FE-stt-data-out", ({ roomId, smsg, ssender }) => {
+    setSender(ssender);
+    setFinalScript(smsg);
+  })
 
   // no-speech|audio-capture|not-allowed|not-supported-browser
   stt.on('error', (error) => {
@@ -419,10 +427,10 @@ const Room = (props) => {
           {/* Joined User Vidoe */}
           {peers &&
             peers.map((peer, index, arr) => createUserVideo(peer, index, arr))}
-          <Subtitle>
-            <strong>{currentUser}</strong>
+          <SmallTitle>
+            <strong>{sender}</strong>
             <p>{interimScript}</p>
-          </Subtitle>
+          </SmallTitle>
         </VideoContainer>
 
         <BottomBar
@@ -440,6 +448,7 @@ const Room = (props) => {
         />
       </VideoAndBarContainer>
       <Chat display={displayChat} roomId={roomId} />
+      <Subtitle display={displaySub} roomId={roomId} />
     </RoomContainer>
   );
 };
@@ -495,7 +504,7 @@ const VideoBox = styled.div`
   }
 `;
 
-const Subtitle = styled.div`
+const SmallTitle = styled.div`
   width: 80%;
   color: #d7d7d7;
   background-color: gray;

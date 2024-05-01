@@ -109,6 +109,10 @@ io.on('connection', (socket) => {
       .to(roomId)
       .emit('FE-toggle-camera', { userId: socket.id, switchTarget });
   });
+
+  socket.on('BE-stt-data-out', ({ roomId, smsg, ssender }) => {
+    io.sockets.in(roomId).emit('FE-stt-data-out', { smsg, ssender });
+  });
 });
 
 http.listen(PORT, () => {
