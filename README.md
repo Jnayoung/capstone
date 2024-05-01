@@ -26,7 +26,7 @@ Videe-Group-Meeting is a simple video chat application for multi-users based on 
 
 ## Installation
 ### Clone
-- Clone this repo to your local machine using `https://github.com/Hyunse/video-group-meeting.git`
+- Clone this repo to your local machine using `git clone https://github.com/Jnayoung/capstone.git ./`
 
 ### Setup
 **Client**
@@ -34,10 +34,11 @@ Videe-Group-Meeting is a simple video chat application for multi-users based on 
 <pre>
   <code>
     /* Install */
+    cd client
     npm install
     
     /* Run */
-    npm start
+    npm run start
   </code>
 </pre>
 
@@ -46,6 +47,7 @@ Videe-Group-Meeting is a simple video chat application for multi-users based on 
 <pre>
   <code>
     /* Install */
+    cd server
     npm install
     
     /* Run */
