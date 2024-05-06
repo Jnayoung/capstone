@@ -97,6 +97,7 @@ const Bar = styled.div`
   align-items: center;
   font-weight: 500;
   background-color: #4ea1d3;
+  overflow: hidden;
 `;
 const Left = styled.div`
   display: flex;

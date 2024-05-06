@@ -4,8 +4,12 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const PORT = process.env.PORT || 3001;
 const path = require('path');
+const { send } = require('process');
 
 let socketList = {};
+let roomId = "";
+let msg = "";
+let sender = "";
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -110,8 +114,14 @@ io.on('connection', (socket) => {
       .emit('FE-toggle-camera', { userId: socket.id, switchTarget });
   });
 
-  socket.on('BE-stt-data-out', ({ roomId, smsg, ssender }) => {
-    io.sockets.in(roomId).emit('FE-stt-data-out', { smsg, ssender });
+  socket.on('BE-stt-data-out', ({ roomId, userName, data }) => {
+    roomId = roomId;
+    sender = userName;
+    msg = data;
+  });
+
+  socket.emit('FE-stt-sender', ({ roomId, smsg, ssender }) => {
+    io.sockets.in(roomId).emit('FE-stt-data-out', { smsg: msg, ssender: sender });
   });
 });
 

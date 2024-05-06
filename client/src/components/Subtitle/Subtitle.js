@@ -6,11 +6,11 @@ const Subtitle = ({ display, roomId }) => {
   const currentUser = sessionStorage.getItem('user');
   const [msg, setMsg] = useState([]);
   const messagesEndRef = useRef(null);
-  const inputRef = useRef();
+  const [myMsg, setMyMsg] = useState([]);
 
   useEffect(() => {
-    socket.on('FE-receive-message', ({ msg, sender }) => {
-      setMsg((msgs) => [...msgs, { sender, msg }]);
+    socket.on('FE-stt-sender', ({ roomId, smsg, ssender }) => {
+      setMsg((msgs) => [...msgs, { ssender, smsg }]);
     });
   }, []);
 
@@ -20,17 +20,6 @@ const Subtitle = ({ display, roomId }) => {
   const scrollToBottom = () => {
     messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
   }
-
-  const sendMessage = (e) => {
-    if (e.key === 'Enter') {
-      const msg = e.target.value;
-
-      if (msg) {
-        socket.emit('BE-send-message', { roomId, msg, sender: currentUser });
-        inputRef.current.value = '';
-      }
-    }
-  };
 
   return (
     <ChatContainer className={display ? '' : 'width0'}>
@@ -58,11 +47,6 @@ const Subtitle = ({ display, roomId }) => {
           <div style={{ float: 'left', clear: 'both' }} ref={messagesEndRef} />
         </MessageList>
       </ChatArea>
-      <BottomInput
-        ref={inputRef}
-        onKeyUp={sendMessage}
-        placeholder="Enter your message"
-      />
     </ChatContainer>
   );
 };
@@ -152,20 +136,6 @@ const UserMessage = styled.div`
     color: white;
     font-size: 14px;
     text-align: left;
-  }
-`;
-
-const BottomInput = styled.input`
-  bottom: 0;
-  width: 100%;
-  height: 8%;
-  padding: 15px;
-  border-top: 1px solid rgb(69, 69, 82, 0.25);
-  box-sizing: border-box;
-  opacity: 0.7;
-
-  :focus {
-    outline: none;
   }
 `;
 

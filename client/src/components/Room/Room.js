@@ -16,6 +16,7 @@ const Room = (props) => {
   });
   const [sender, setSender] = useState('anonymous');
   const [videoDevices, setVideoDevices] = useState([]);
+  const [audioDevices, setAudioDevices] = useState([]);
   const [displayChat, setDisplayChat] = useState(false);
   const [displaySub, setDisplaySub] = useState(false);
   const [screenShare, setScreenShare] = useState(false);
@@ -33,6 +34,11 @@ const Room = (props) => {
       setVideoDevices(filtered);
     });
 
+    navigator.mediaDevices.enumerateDevices().then((devices) => {
+      const filtered = devices.filter((device) => device.kind === 'audioinput');
+      setAudioDevices(filtered);
+    });
+
     // Set Back Button Event
     window.addEventListener('popstate', goToBack);
 
@@ -42,6 +48,7 @@ const Room = (props) => {
       .then((stream) => {
         userVideoRef.current.srcObject = stream;
         userStream.current = stream;
+        stt.start();
 
         socket.emit('BE-join-room', { roomId, userName: currentUser });
         socket.on('FE-user-join', (users) => {
@@ -70,13 +77,8 @@ const Room = (props) => {
                 };
               });
             }
-
-            //bindSttEvents();
-            stt.onStart();
           });
-
           setPeers(peers);
-
         });
 
         socket.on('FE-receive-call', ({ signal, from, info }) => {
@@ -239,12 +241,10 @@ const Room = (props) => {
 
   stt.on('start', () => {
     console.log('start :>> ');
-    //$btnMic.classList.replace('off', 'on');
   });
 
   stt.on('end', () => {
     console.log('end :>> ');
-    //$btnMic.classList.replace('on', 'off');
   });
 
   const [finalScript, setFinalScript] = useState('');
@@ -254,10 +254,10 @@ const Room = (props) => {
     setSender(currentUser);
     setinterimScript(interimTranscript);
     setFinalScript(finalTranscript);
-    socket.emit('BE-stt-data-out', { userName: currentUser, data: finalScript });
+    socket.emit('BE-stt-data-out', { roomId, ssender: currentUser, smsg: finalScript });
   });
 
-  socket.on("FE-stt-data-out", ({ roomId, smsg, ssender }) => {
+  socket.on("FE-stt-sender", ({ roomId, smsg, ssender }) => {
     setSender(ssender);
     setFinalScript(smsg);
   })
@@ -265,14 +265,13 @@ const Room = (props) => {
   // no-speech|audio-capture|not-allowed|not-supported-browser
   stt.on('error', (error) => {
     console.log('error :>> ', error);
-    //$btnMic.classList.replace('on', 'off');
 
     switch (error) {
       case 'not-allowed':
         alert('마이크 권한이 필요합니다.');
         break;
       default:
-        alert(error);
+        console.log(error);
     }
   });
 
@@ -285,7 +284,7 @@ const Room = (props) => {
     setUserVideoAudio((preList) => {
       let videoSwitch = preList['localUser'].video;
       let audioSwitch = preList['localUser'].audio;
-      //console.log(audioSwitch);
+      console.log(audioSwitch);
 
       if (target === 'video') {
         const userVideoTrack = userVideoRef.current.srcObject.getVideoTracks()[0];
@@ -302,12 +301,14 @@ const Room = (props) => {
         }
       }
 
+      // if (audioSwitch) stt.stop()
+      // else stt.start();
+
       return {
         ...preList,
         localUser: { video: videoSwitch, audio: audioSwitch },
       };
     });
-    stt[stt.getIsRecognizing() ? 'stop' : 'start']();
     socket.emit('BE-toggle-camera-audio', { roomId, switchTarget: target });
   };
 
@@ -427,10 +428,10 @@ const Room = (props) => {
           {/* Joined User Vidoe */}
           {peers &&
             peers.map((peer, index, arr) => createUserVideo(peer, index, arr))}
-          <SmallTitle>
+          {/* <SmallTitle>
             <strong>{sender}</strong>
             <p>{interimScript}</p>
-          </SmallTitle>
+          </SmallTitle> */}
         </VideoContainer>
 
         <BottomBar
