@@ -1,39 +1,41 @@
-import React, { useEffect, useState, useRef } from 'react';
-import styled from 'styled-components';
-import socket from '../../socket';
+import React, { useEffect, useState, useRef } from "react";
+import styled from "styled-components";
+import socket from "../../socket";
 
 const Chat = ({ display, roomId }) => {
-  const currentUser = sessionStorage.getItem('user');
+  const currentUser = sessionStorage.getItem("user");
   const [msg, setMsg] = useState([]);
   const messagesEndRef = useRef(null);
   const inputRef = useRef();
 
   useEffect(() => {
-    socket.on('FE-receive-message', ({ msg, sender }) => {
+    socket.on("FE-receive-message", ({ msg, sender }) => {
       setMsg((msgs) => [...msgs, { sender, msg }]);
     });
   }, []);
 
   // Scroll to Bottom of Message List
-  useEffect(() => { scrollToBottom() }, [msg])
+  useEffect(() => {
+    scrollToBottom();
+  }, [msg]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-  }
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  };
 
   const sendMessage = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       const msg = e.target.value;
 
       if (msg) {
-        socket.emit('BE-send-message', { roomId, msg, sender: currentUser });
-        inputRef.current.value = '';
+        socket.emit("BE-send-message", { roomId, msg, sender: currentUser });
+        inputRef.current.value = "";
       }
     }
   };
 
   return (
-    <ChatContainer className={display ? '' : 'width0'}>
+    <ChatContainer className={display ? "" : "width0"}>
       <TopHeader>Group Chat Room</TopHeader>
       <ChatArea>
         <MessageList>
@@ -55,7 +57,7 @@ const Chat = ({ display, roomId }) => {
                 );
               }
             })}
-          <div style={{ float: 'left', clear: 'both' }} ref={messagesEndRef} />
+          <div style={{ float: "left", clear: "both" }} ref={messagesEndRef} />
         </MessageList>
       </ChatArea>
       <BottomInput
@@ -71,7 +73,7 @@ const ChatContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 25%;
-  hieght: 100%;
+  height: 100%;
   background-color: white;
   transition: all 0.5s ease;
   overflow: hidden;

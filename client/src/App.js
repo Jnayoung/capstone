@@ -1,9 +1,10 @@
-import React from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
-import Main from './components/Main/Main';
-import Room from './components/Room/Room';
-import Result from './components/result/result';
-import styled from 'styled-components';
+import React from "react";
+import { BrowserRouter, Route, Switch } from "react-router-dom";
+import Main from "./components/Main/Main";
+import Room from "./components/Room/Room";
+import Result from "./components/result/result";
+import styled from "styled-components";
+import "./App.css";
 
 function App() {
   return (
@@ -27,7 +28,7 @@ const AppContainer = styled.div`
   justify-content: center;
   font-size: calc(8px + 2vmin);
   color: white;
-  background-color: #454552;
+  background-color: whitesmoke;
   text-align: center;
 `;
 

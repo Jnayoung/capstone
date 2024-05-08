@@ -1,25 +1,24 @@
-import React, { useRef, useState, useEffect } from 'react';
-import styled from 'styled-components';
-import socket from '../../socket';
+import React, { useRef, useState, useEffect } from "react";
+import styled from "styled-components";
+import socket from "../../socket";
 
 const Main = (props) => {
   const roomRef = useRef();
   const userRef = useRef();
   const [err, setErr] = useState(false);
-  const [errMsg, setErrMsg] = useState('');
+  const [errMsg, setErrMsg] = useState("");
 
   useEffect(() => {
-
-    socket.on('FE-error-user-exist', ({ error }) => {
+    socket.on("FE-error-user-exist", ({ error }) => {
       if (!error) {
         const roomName = roomRef.current.value;
         const userName = userRef.current.value;
 
-        sessionStorage.setItem('user', userName);
+        sessionStorage.setItem("user", userName);
         props.history.push(`/room/${roomName}`);
       } else {
         setErr(error);
-        setErrMsg('User name already exist');
+        setErrMsg("User name already exist");
       }
     });
   }, [props.history]);
@@ -30,51 +29,93 @@ const Main = (props) => {
 
     if (!roomName || !userName) {
       setErr(true);
-      setErrMsg('Enter Room Name or User Name');
+      setErrMsg("Enter Room Name or User Name");
     } else {
-      socket.emit('BE-check-user', { roomId: roomName, userName });
+      socket.emit("BE-check-user", { roomId: roomName, userName });
     }
   }
 
   return (
-    <MainContainer>
-      <Row>
-        <Label htmlFor="roomName">Room Name</Label>
-        <Input type="text" id="roomName" ref={roomRef} />
-      </Row>
-      <Row>
-        <Label htmlFor="userName">User Name</Label>
-        <Input type="text" id="userName" ref={userRef} />
-      </Row>
-      <JoinButton onClick={clickJoin}> Join </JoinButton>
-      {err ? <Error>{errMsg}</Error> : null}
-    </MainContainer>
+    <Body>
+      <H1 id="h1">🧑‍💻 Video Group Meeting</H1>
+      <MainContainer>
+        <Row>
+          <div>
+            <Label htmlFor="roomName">📁 Room Number</Label>
+          </div>
+          <div>
+            <Input type="text" id="roomName" ref={roomRef} />
+          </div>
+        </Row>
+        <Row>
+          <div>
+            <Label htmlFor="userName">📁 User Name</Label>
+          </div>
+          <div>
+            <Input type="text" id="userName" ref={userRef} />
+          </div>
+        </Row>
+        <JoinButton onClick={clickJoin}> Join </JoinButton>
+        {err ? <Error>{errMsg}</Error> : null}
+      </MainContainer>
+    </Body>
   );
 };
+
+// styled
+
+const Body = styled.body`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const H1 = styled.h1`
+  margin-top: -20px;
+  color: black;
+  font-family: "NunitoBlack";
+  //text-shadow: 0 2px 15px rgba(0, 0, 0, 0.25);
+  //-webkit-text-stroke-width: 0.8px;
+  //-webkit-text-stroke-color: white;
+`;
 
 const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border-radius: 30px;
+  width: 650px;
+  height: 400px;
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.15);
 `;
 
 const Row = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-top: 15px;
+
+  margin: 20px 50px 0px;
   line-height: 35px;
 `;
 
-const Label = styled.label``;
+const Label = styled.label`
+  font-family: "NunitoExtraBold";
+  color: black;
+`;
 
 const Input = styled.input`
   width: 150px;
   height: 35px;
+  padding: 2px 10px;
   margin-left: 15px;
-  padding-left: 10px;
   outline: none;
-  border: none;
-  border-radius: 5px;
+  border: 1px solid black;
+  border-radius: 20px;
+  font-family: "NunitoBold";
+  color: black;
 `;
 
 const Error = styled.div`
@@ -84,18 +125,23 @@ const Error = styled.div`
 `;
 
 const JoinButton = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
   height: 40px;
-  margin-top: 35px;
+  margin-top: 60px;
+  padding: 8px 20px;
   outline: none;
   border: none;
-  border-radius: 15px;
-  color: #d8e9ef;
-  background-color: #4ea1d3;
+  border-radius: 10px;
+  font-family: "NunitoExtraBold";
+  color: white;
+  background-color: black;
   font-size: 25px;
-  font-weight: 500;
 
   :hover {
-    background-color: #7bb1d1;
+    background-color: #fcd53f;
+    color: black;
     cursor: pointer;
   }
 `;

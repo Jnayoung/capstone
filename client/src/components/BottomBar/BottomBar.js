@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import styled from 'styled-components';
+import React, { useCallback } from "react";
+import styled from "styled-components";
 
 const BottomBar = ({
   clickChat,
@@ -12,7 +12,7 @@ const BottomBar = ({
   screenShare,
   videoDevices,
   showVideoDevices,
-  setShowVideoDevices
+  setShowVideoDevices,
 }) => {
   const handleToggle = useCallback(
     (e) => {
@@ -24,12 +24,12 @@ const BottomBar = ({
   return (
     <Bar>
       <Left>
-        <CameraButton onClick={toggleCameraAudio} data-switch='video'>
+        <CameraButton onClick={toggleCameraAudio} data-switch="video">
           <div>
             {userVideoAudio.video ? (
-              <FaIcon className='fas fa-video'></FaIcon>
+              <FaIcon className="fas fa-video"></FaIcon>
             ) : (
-              <FaIcon className='fas fa-video-slash'></FaIcon>
+              <FaIcon className="fas fa-video-slash"></FaIcon>
             )}
           </div>
           카메라
@@ -38,20 +38,28 @@ const BottomBar = ({
           <SwitchList>
             {videoDevices.length > 0 &&
               videoDevices.map((device) => {
-                return <div key={device.deviceId} onClick={clickCameraDevice} data-value={device.deviceId} >{device.label}</div>;
+                return (
+                  <div
+                    key={device.deviceId}
+                    onClick={clickCameraDevice}
+                    data-value={device.deviceId}
+                  >
+                    {device.label}
+                  </div>
+                );
               })}
             <div>Switch Camera</div>
           </SwitchList>
         )}
         <SwitchMenu onClick={handleToggle}>
-          <i className='fas fa-angle-up'></i>
+          <i className="fas fa-angle-up"></i>
         </SwitchMenu>
-        <CameraButton onClick={toggleCameraAudio} data-switch='audio'>
+        <CameraButton onClick={toggleCameraAudio} data-switch="audio">
           <div>
             {userVideoAudio.audio ? (
-              <FaIcon className='fas fa-microphone'></FaIcon>
+              <FaIcon className="fas fa-microphone"></FaIcon>
             ) : (
-              <FaIcon className='fas fa-microphone-slash'></FaIcon>
+              <FaIcon className="fas fa-microphone-slash"></FaIcon>
             )}
           </div>
           마이크
@@ -61,25 +69,26 @@ const BottomBar = ({
         <ScreenButton onClick={clickScreenSharing}>
           <div>
             <FaIcon
-              className={`fas fa-desktop ${screenShare ? 'sharing' : ''}`}
+              className={`fas fa-desktop ${screenShare ? "sharing" : ""}`}
             ></FaIcon>
           </div>
           화면 공유
         </ScreenButton>
         <ChatButton onClick={clickChat}>
           <div>
-            <FaIcon className='fas fa-comments'></FaIcon>
+            <FaIcon className="fas fa-comments"></FaIcon>
           </div>
           채팅
         </ChatButton>
         <SubtitleButton onClick={clickSubtitle}>
           <div>
-            <FaIcon className='fas fa-comments'></FaIcon>
+            <FaIcon className="fas fa-comments"></FaIcon>
           </div>
           대화기록
         </SubtitleButton>
       </Center>
       <Right>
+        <DownButton>Download</DownButton>
         <StopButton onClick={goToBack}>Stop</StopButton>
       </Right>
     </Bar>
@@ -96,7 +105,7 @@ const Bar = styled.div`
   justify-content: center;
   align-items: center;
   font-weight: 500;
-  background-color: #4ea1d3;
+  background-color: black;
   overflow: hidden;
 `;
 const Left = styled.div`
@@ -112,16 +121,19 @@ const Center = styled.div`
   justify-content: center;
 `;
 
-const Right = styled.div``;
+const Right = styled.div`
+  display: flex;
+`;
 
 const ChatButton = styled.div`
   width: 75px;
   border: none;
   font-size: 0.9375rem;
   padding: 5px;
+  margin-top: 5px;
 
   :hover {
-    background-color: #77b7dd;
+    background-color: LightSteelBlue;
     cursor: pointer;
     border-radius: 15px;
   }
@@ -136,6 +148,7 @@ const SubtitleButton = styled.div`
   border: none;
   font-size: 0.9375rem;
   padding: 5px;
+  margin-top: 5px;
 
   :hover {
     background-color: #77b7dd;
@@ -153,6 +166,7 @@ const ScreenButton = styled.div`
   border: none;
   font-size: 0.9375rem;
   padding: 5px;
+  margin-top: 5px;
 
   :hover {
     background-color: #77b7dd;
@@ -174,11 +188,41 @@ const StopButton = styled.div`
   width: 75px;
   height: 30px;
   border: none;
-  font-size: 0.9375rem;
-  line-height: 30px;
+  font-size: 15px;
+  line-height: 20px;
   margin-right: 15px;
   background-color: #ee2560;
-  border-radius: 15px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3px 5px;
+  outline: none;
+  border-radius: 10px;
+  font-family: "NunitoExtraBold";
+
+  :hover {
+    background-color: #f25483;
+    cursor: pointer;
+  }
+`;
+
+const DownButton = styled.div`
+  width: 75px;
+  height: 30px;
+  border: none;
+  font-size: 15px;
+  line-height: 20px;
+  margin-right: 15px;
+  background-color: CornFlowerBlue;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3px 5px;
+  outline: none;
+  border-radius: 10px;
+  font-family: "NunitoExtraBold";
 
   :hover {
     background-color: #f25483;
@@ -192,6 +236,7 @@ const CameraButton = styled.div`
   border: none;
   font-size: 0.9375rem;
   padding: 5px;
+  margin-top: 5px;
 
   :hover {
     background-color: #77b7dd;
