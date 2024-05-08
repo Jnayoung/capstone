@@ -443,10 +443,12 @@ const Room = (props) => {
           {/* Joined User Vidoe */}
           {peers &&
             peers.map((peer, index, arr) => createUserVideo(peer, index, arr))}
-          {/* <SmallTitle>
-            <strong>{sender}</strong>
-            <p>{interimScript}</p>
-          </SmallTitle> */}
+          {
+            <SmallTitle>
+              <strong>{sender}</strong>
+              <p>{interimScript}</p>
+            </SmallTitle>
+          }
         </VideoContainer>
 
         <BottomBar

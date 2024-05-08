@@ -40,20 +40,22 @@ const Main = (props) => {
       <H1 id="h1">🧑‍💻 Video Group Meeting</H1>
       <MainContainer>
         <Row>
-          <div>
-            <Label htmlFor="roomName">📁 Room Number</Label>
-          </div>
-          <div>
-            <Input type="text" id="roomName" ref={roomRef} />
-          </div>
+          <Label htmlFor="roomName">📁 Room Number</Label>
+          <Input
+            type="text"
+            id="roomName"
+            ref={roomRef}
+            style={{ margin: "0px 25px" }}
+          />
         </Row>
         <Row>
-          <div>
-            <Label htmlFor="userName">📁 User Name</Label>
-          </div>
-          <div>
-            <Input type="text" id="userName" ref={userRef} />
-          </div>
+          <Label htmlFor="userName">📁 User Name</Label>
+          <Input
+            type="text"
+            id="userName"
+            ref={userRef}
+            style={{ marginLeft: "43px" }}
+          />
         </Row>
         <JoinButton onClick={clickJoin}> Join </JoinButton>
         {err ? <Error>{errMsg}</Error> : null}
@@ -77,9 +79,6 @@ const H1 = styled.h1`
   margin-top: -20px;
   color: black;
   font-family: "NunitoBlack";
-  //text-shadow: 0 2px 15px rgba(0, 0, 0, 0.25);
-  //-webkit-text-stroke-width: 0.8px;
-  //-webkit-text-stroke-color: white;
 `;
 
 const MainContainer = styled.div`
@@ -95,8 +94,6 @@ const MainContainer = styled.div`
 `;
 
 const Row = styled.div`
-  display: flex;
-
   margin: 20px 50px 0px;
   line-height: 35px;
 `;
