@@ -2,18 +2,29 @@ import React, { useCallback } from "react";
 import styled from "styled-components";
 
 const BottomBar = ({
-  clickChat,
-  clickSubtitle,
   clickCameraDevice,
   goToBack,
   toggleCameraAudio,
   userVideoAudio,
-  clickScreenSharing,
-  screenShare,
   videoDevices,
   showVideoDevices,
   setShowVideoDevices,
+  increaseFontSize,
+  decreaseFontSize,
+  resetFontSize,
 }) => {
+  const handleIncreaseFontSize = useCallback(() => {
+    increaseFontSize();
+  }, [increaseFontSize]);
+
+  const handleDecreaseFontSize = useCallback(() => {
+    decreaseFontSize();
+  }, [decreaseFontSize]);
+
+  const handleResetFontSize = useCallback(() => {
+    resetFontSize();
+  }, [resetFontSize]);
+
   const handleToggle = useCallback(
     (e) => {
       setShowVideoDevices((state) => !state);
@@ -24,6 +35,12 @@ const BottomBar = ({
   return (
     <Bar>
       <Left>
+        <Label>Sub</Label>
+        <PlusButton onClick={increaseFontSize}>+</PlusButton>
+        <MinusButton onClick={decreaseFontSize}>-</MinusButton>
+        <ResetButton onClick={resetFontSize}>🔄️</ResetButton>
+      </Left>
+      <Center>
         <CameraButton onClick={toggleCameraAudio} data-switch="video">
           <div>
             {userVideoAudio.video ? (
@@ -51,9 +68,6 @@ const BottomBar = ({
             <div>Switch Camera</div>
           </SwitchList>
         )}
-        <SwitchMenu onClick={handleToggle}>
-          <i className="fas fa-angle-up"></i>
-        </SwitchMenu>
         <CameraButton onClick={toggleCameraAudio} data-switch="audio">
           <div>
             {userVideoAudio.audio ? (
@@ -64,33 +78,9 @@ const BottomBar = ({
           </div>
           마이크
         </CameraButton>
-      </Left>
-      <Center>
-        <ScreenButton onClick={clickScreenSharing}>
-          <div>
-            <FaIcon
-              className={`fas fa-desktop ${screenShare ? "sharing" : ""}`}
-            ></FaIcon>
-          </div>
-          화면 공유
-        </ScreenButton>
-        <ChatButton onClick={clickChat}>
-          <div>
-            <FaIcon className="fas fa-comments"></FaIcon>
-          </div>
-          채팅
-        </ChatButton>
-        <SubtitleButton onClick={clickSubtitle}>
-          <div>
-            <FaIcon className="fas fa-comments"></FaIcon>
-          </div>
-          대화기록
-        </SubtitleButton>
       </Center>
-      <Right>
-        <DownButton>Download</DownButton>
-        <StopButton onClick={goToBack}>Stop</StopButton>
-      </Right>
+      {/* <DownButton>Download</DownButton> */}
+      <StopButton onClick={goToBack}>Stop</StopButton>
     </Bar>
   );
 };
@@ -102,141 +92,113 @@ const Bar = styled.div`
   width: 100%;
   height: 8%;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  font-weight: 500;
   background-color: black;
   overflow: hidden;
 `;
+
 const Left = styled.div`
   display: flex;
   align-items: center;
-
   margin-left: 15px;
+  /* border: 1px solid white;
+  border-radius: 10px; */
+  padding: 8px 15px;
+`;
+
+const Label = styled.label`
+  font-family: "NunitoExtraBold";
+  font-size: 15px;
+  letter-spacing: 1px;
+  margin-right: 8px;
+`;
+
+const PlusButton = styled.div`
+  width: 30px;
+  height: 30px;
+  border: none;
+  font-size: 25px;
+  line-height: 20px;
+  margin-right: 6px;
+  //background-color: #f6d365;
+  background: linear-gradient(0deg, #f6d365 0%, #ffe9aa 100%);
+
+  color: black;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3px 3px;
+  outline: none;
+  border-radius: 7px;
+  font-family: "NunitoExtraBold";
+
+  :hover {
+    opacity: 0.8;
+    cursor: pointer;
+  }
+`;
+
+const MinusButton = styled.div`
+  width: 30px;
+  height: 30px;
+  border: none;
+  font-size: 25px;
+  line-height: 20px;
+  margin-right: 6px;
+  background: linear-gradient(0deg, #f6d365 0%, #ffe9aa 100%);
+  color: black;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3px 3px;
+  outline: none;
+  border-radius: 7px;
+  font-family: "NunitoExtraBold";
+
+  :hover {
+    opacity: 0.8;
+    cursor: pointer;
+  }
+`;
+
+const ResetButton = styled.div`
+  width: 30px;
+  height: 30px;
+  border: none;
+  font-size: 36px;
+  line-height: 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3px 3px;
+  outline: none;
+  border-radius: 7px;
+  font-family: "NunitoExtraBold";
+
+  :hover {
+    opacity: 0.8;
+    cursor: pointer;
+  }
 `;
 
 const Center = styled.div`
-  flex: 1;
   display: flex;
-  justify-content: center;
-`;
-
-const Right = styled.div`
-  display: flex;
-`;
-
-const ChatButton = styled.div`
-  width: 75px;
-  border: none;
-  font-size: 0.9375rem;
-  padding: 5px;
-  margin-top: 5px;
-
-  :hover {
-    background-color: LightSteelBlue;
-    cursor: pointer;
-    border-radius: 15px;
-  }
-
-  * {
-    pointer-events: none;
-  }
-`;
-
-const SubtitleButton = styled.div`
-  width: 75px;
-  border: none;
-  font-size: 0.9375rem;
-  padding: 5px;
-  margin-top: 5px;
-
-  :hover {
-    background-color: #77b7dd;
-    cursor: pointer;
-    border-radius: 15px;
-  }
-
-  * {
-    pointer-events: none;
-  }
-`;
-
-const ScreenButton = styled.div`
-  width: auto;
-  border: none;
-  font-size: 0.9375rem;
-  padding: 5px;
-  margin-top: 5px;
-
-  :hover {
-    background-color: #77b7dd;
-    cursor: pointer;
-    border-radius: 15px;
-  }
-
-  .sharing {
-    color: #ee2560;
-  }
-`;
-
-const FaIcon = styled.i`
-  width: 30px;
-  font-size: calc(16px + 1vmin);
-`;
-
-const StopButton = styled.div`
-  width: 75px;
-  height: 30px;
-  border: none;
-  font-size: 15px;
-  line-height: 20px;
-  margin-right: 15px;
-  background-color: #ee2560;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 3px 5px;
-  outline: none;
-  border-radius: 10px;
-  font-family: "NunitoExtraBold";
-
-  :hover {
-    background-color: #f25483;
-    cursor: pointer;
-  }
-`;
-
-const DownButton = styled.div`
-  width: 75px;
-  height: 30px;
-  border: none;
-  font-size: 15px;
-  line-height: 20px;
-  margin-right: 15px;
-  background-color: CornFlowerBlue;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 3px 5px;
-  outline: none;
-  border-radius: 10px;
-  font-family: "NunitoExtraBold";
-
-  :hover {
-    background-color: #f25483;
-    cursor: pointer;
-  }
+  margin-right: 85px;
 `;
 
 const CameraButton = styled.div`
+  font-family: "NunitoExtraBold";
   position: relative;
   width: 75px;
   border: none;
   font-size: 0.9375rem;
   padding: 5px;
   margin-top: 5px;
+  margin-left: 15px;
 
   :hover {
     background-color: #77b7dd;
@@ -254,30 +216,6 @@ const CameraButton = styled.div`
 
   .fa-video-slash {
     color: #ee2560;
-  }
-`;
-
-const SwitchMenu = styled.div`
-  display: flex;
-  position: absolute;
-  width: 20px;
-  top: 7px;
-  left: 80px;
-  z-index: 1;
-
-  :hover {
-    background-color: #476d84;
-    cursor: pointer;
-    border-radius: 15px;
-  }
-
-  * {
-    pointer-events: none;
-  }
-
-  > i {
-    width: 90%;
-    font-size: calc(10px + 1vmin);
   }
 `;
 
@@ -310,6 +248,79 @@ const SwitchList = styled.div`
     border-top: 1px solid white;
     cursor: context-menu !important;
   }
+`;
+
+// const DownButton = styled.div`
+//   width: 75px;
+//   height: 30px;
+//   border: none;
+//   font-size: 15px;
+//   line-height: 20px;
+//   margin-right: 15px;
+//   background-color: CornFlowerBlue;
+
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   padding: 3px 5px;
+//   outline: none;
+//   border-radius: 10px;
+//   font-family: "NunitoExtraBold";
+
+//   :hover {
+//     background-color: #f25483;
+//     cursor: pointer;
+//   }
+// `;
+
+const StopButton = styled.div`
+  width: 75px;
+  height: 30px;
+  border: none;
+  font-size: 16px;
+  line-height: 20px;
+  margin-right: 20px;
+  background: rgb(251, 33, 117);
+  background: linear-gradient(
+    0deg,
+    rgba(251, 33, 117, 1) 0%,
+    rgba(234, 76, 137, 1) 100%
+  );
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 4px;
+  outline: none;
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: "NunitoExtraBold";
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+
+  :before {
+    position: absolute;
+    content: "";
+    display: inline-block;
+    top: -180px;
+    left: 0;
+    width: 30px;
+    height: 100%;
+    background-color: #fff;
+  }
+
+  :hover {
+    text-decoration: none;
+    opacity: 0.8;
+    cursor: pointer;
+  }
+`;
+
+const FaIcon = styled.i`
+  width: 30px;
+  font-size: calc(16px + 1vmin);
 `;
 
 export default BottomBar;

@@ -37,3 +37,8 @@
   font-family: NunitoBlack;
   src: url("./fonts/Nunito-Black.woff");
 }
+
+@font-face {
+  font-family: JuaRegular;
+  src: url("./fonts/Jua-Regular.woff");
+}

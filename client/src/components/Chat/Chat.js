@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import socket from "../../socket";
 
-const Chat = ({ display, roomId }) => {
+const Chat = ({ roomId }) => {
   const currentUser = sessionStorage.getItem("user");
   const [msg, setMsg] = useState([]);
   const messagesEndRef = useRef(null);
@@ -35,8 +35,8 @@ const Chat = ({ display, roomId }) => {
   };
 
   return (
-    <ChatContainer className={display ? "" : "width0"}>
-      <TopHeader>Group Chat Room</TopHeader>
+    <ChatContainer>
+      <TopHeader>Chat</TopHeader>
       <ChatArea>
         <MessageList>
           {msg &&
@@ -71,13 +71,20 @@ const Chat = ({ display, roomId }) => {
 
 const ChatContainer = styled.div`
   display: flex;
+  flex: 2;
+  position: relative;
   flex-direction: column;
-  width: 25%;
+  width: 30%;
   height: 100%;
   background-color: white;
   transition: all 0.5s ease;
   overflow: hidden;
 `;
+
+// const ChatContainer = styled.div`
+//   flex: 1;
+//   margin-left: 20px; // 비디오와 채팅 컨테이너 사이의 간격 조정
+// `;
 
 const TopHeader = styled.div`
   width: 100%;

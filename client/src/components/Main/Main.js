@@ -45,7 +45,7 @@ const Main = (props) => {
             type="text"
             id="roomName"
             ref={roomRef}
-            style={{ margin: "0px 25px" }}
+            style={{ marginLeft: "25px" }}
           />
         </Row>
         <Row>
@@ -54,7 +54,7 @@ const Main = (props) => {
             type="text"
             id="userName"
             ref={userRef}
-            style={{ marginLeft: "43px" }}
+            style={{ marginLeft: "67px" }}
           />
         </Row>
         <JoinButton onClick={clickJoin}> Join </JoinButton>

@@ -6,7 +6,6 @@ import STT from "stt.js";
 import VideoCard from "../Video/VideoCard";
 import BottomBar from "../BottomBar/BottomBar";
 import Chat from "../Chat/Chat";
-import Subtitle from "../Subtitle/Subtitle";
 
 const Room = (props) => {
   const currentUser = sessionStorage.getItem("user");
@@ -17,9 +16,6 @@ const Room = (props) => {
   const [sender, setSender] = useState("anonymous");
   const [videoDevices, setVideoDevices] = useState([]);
   const [audioDevices, setAudioDevices] = useState([]);
-  const [displayChat, setDisplayChat] = useState(false);
-  const [displaySub, setDisplaySub] = useState(false);
-  const [screenShare, setScreenShare] = useState(false);
   const [showVideoDevices, setShowVideoDevices] = useState(false);
   const peersRef = useRef([]);
   const userVideoRef = useRef();
@@ -210,22 +206,10 @@ const Room = (props) => {
   function writeUserName(userName, index) {
     if (userVideoAudio.hasOwnProperty(userName)) {
       if (!userVideoAudio[userName].video) {
-        return <UserName key={userName}>{userName}</UserName>;
+        return <OffUserName key={userName}>{userName}</OffUserName>;
       }
     }
   }
-
-  // Open Chat
-  const clickChat = (e) => {
-    e.stopPropagation();
-    setDisplayChat(!displayChat);
-  };
-
-  // Open Subtitle
-  const clickSubtitle = (e) => {
-    e.stopPropagation();
-    setDisplaySub(!displaySub);
-  };
 
   // BackButton
   const goToBack = (e) => {
@@ -319,48 +303,6 @@ const Room = (props) => {
     socket.emit("BE-toggle-camera-audio", { roomId, switchTarget: target });
   };
 
-  const clickScreenSharing = () => {
-    if (!screenShare) {
-      navigator.mediaDevices
-        .getDisplayMedia({ cursor: true })
-        .then((stream) => {
-          const screenTrack = stream.getTracks()[0];
-
-          peersRef.current.forEach(({ peer }) => {
-            // replaceTrack (oldTrack, newTrack, oldStream);
-            peer.replaceTrack(
-              peer.streams[0]
-                .getTracks()
-                .find((track) => track.kind === "video"),
-              screenTrack,
-              userStream.current
-            );
-          });
-
-          // Listen click end
-          screenTrack.onended = () => {
-            peersRef.current.forEach(({ peer }) => {
-              peer.replaceTrack(
-                screenTrack,
-                peer.streams[0]
-                  .getTracks()
-                  .find((track) => track.kind === "video"),
-                userStream.current
-              );
-            });
-            userVideoRef.current.srcObject = userStream.current;
-            setScreenShare(false);
-          };
-
-          userVideoRef.current.srcObject = stream;
-          screenTrackRef.current = screenTrack;
-          setScreenShare(true);
-        });
-    } else {
-      screenTrackRef.current.onended();
-    }
-  };
-
   const expandScreen = (e) => {
     const elem = e.target;
 
@@ -420,16 +362,50 @@ const Room = (props) => {
     }
   };
 
+  const interimScriptRef = useRef(null);
+
+  // Font size 조절 함수 정의
+  const increaseFontSize = () => {
+    // interimScriptRef가 유효한지 확인
+    if (interimScriptRef.current) {
+      const currentFontSize = parseFloat(
+        window.getComputedStyle(interimScriptRef.current).fontSize
+      );
+      // font-size 증가
+      interimScriptRef.current.style.fontSize = `${currentFontSize + 1}px`;
+    }
+  };
+
+  const decreaseFontSize = () => {
+    // interimScriptRef가 유효한지 확인
+    if (interimScriptRef.current) {
+      const currentFontSize = parseFloat(
+        window.getComputedStyle(interimScriptRef.current).fontSize
+      );
+      // font-size 감소
+      interimScriptRef.current.style.fontSize = `${currentFontSize - 1}px`;
+    }
+  };
+
+  const resetFontSize = () => {
+    if (interimScriptRef.current) {
+      interimScriptRef.current.style.fontSize = ""; // 기본값으로 설정
+    }
+  };
+
   return (
     <RoomContainer onClick={clickBackground}>
-      <VideoAndBarContainer>
+      <VideoAndChatContainer>
+        <Chat roomId={roomId} display={true} />
         <VideoContainer>
           {/* Current User Video */}
           <VideoBox
             className={`width-peer${peers.length > 8 ? "" : peers.length}`}
           >
-            {userVideoAudio["localUser"].video ? null : (
-              <UserName>{currentUser}</UserName>
+            {userVideoAudio["localUser"].video ? (
+              <OnUserName>{currentUser}</OnUserName>
+            ) : (
+              <OffUserName>{currentUser}</OffUserName>
             )}
             <FaIcon className="fas fa-expand" />
             <MyVideo
@@ -446,60 +422,65 @@ const Room = (props) => {
           {
             <SmallTitle>
               <strong>{sender}</strong>
-              <p>{interimScript}</p>
+              <p ref={interimScriptRef}>{interimScript}</p>
             </SmallTitle>
           }
         </VideoContainer>
 
-        <BottomBar
-          clickScreenSharing={clickScreenSharing}
-          clickChat={clickChat}
-          clickSubtitle={clickSubtitle}
-          clickCameraDevice={clickCameraDevice}
-          goToBack={goToBack}
-          toggleCameraAudio={toggleCameraAudio}
-          userVideoAudio={userVideoAudio["localUser"]}
-          screenShare={screenShare}
-          videoDevices={videoDevices}
-          showVideoDevices={showVideoDevices}
-          setShowVideoDevices={setShowVideoDevices}
-        />
-      </VideoAndBarContainer>
-      <Chat display={displayChat} roomId={roomId} />
-      <Subtitle display={displaySub} roomId={roomId} />
+        <Chat roomId={roomId} display={true} />
+      </VideoAndChatContainer>
+
+      <BottomBar
+        clickCameraDevice={clickCameraDevice}
+        goToBack={goToBack}
+        toggleCameraAudio={toggleCameraAudio}
+        userVideoAudio={userVideoAudio["localUser"]}
+        videoDevices={videoDevices}
+        showVideoDevices={showVideoDevices}
+        setShowVideoDevices={setShowVideoDevices}
+        increaseFontSize={increaseFontSize}
+        decreaseFontSize={decreaseFontSize}
+        resetFontSize={resetFontSize}
+      />
     </RoomContainer>
   );
 };
 
 const RoomContainer = styled.div`
   display: flex;
-  width: 100%;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
   max-height: 100vh;
-  flex-direction: row;
   background-color: whitesmoke;
 `;
 
+const VideoAndChatContainer = styled.div`
+  display: flex;
+  flex: 1;
+  width: 88%;
+  height: 83vh;
+  background-color: white;
+  margin-bottom: 95px;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+`;
+
 const VideoContainer = styled.div`
+  display: flex;
+  flex: 3;
+  position: relative;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
   max-width: 100%;
   width: 100vw;
   height: 92%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  align-items: center;
   padding: 5px;
   gap: 5px;
   box-sizing: border-box;
   gap: 10px;
-`;
-
-const VideoAndBarContainer = styled.div`
-  position: flex;
-  flex-direction: column;
-  width: 100%;
-  gap: 10px;
-  height: 100vh;
 `;
 
 const MyVideo = styled.video``;
@@ -514,7 +495,7 @@ const VideoBox = styled.div`
     left: 0;
     width: 100%;
     height: 100%;
-    border-radius: 15px;
+    border-radius: 10px;
   }
 
   :hover {
@@ -526,30 +507,42 @@ const VideoBox = styled.div`
 
 const SmallTitle = styled.div`
   width: 80%;
-  color: #d7d7d7;
-  background-color: gray;
   display: flex;
   justify-content: center;
-  width: 100%;
-  font-size: 16px;
+  align-items: center;
+  background-color: gray;
+  color: #d7d7d7;
   margin-top: 15px;
-  text-align: right;
+  padding: 8px;
   gap: 20px;
+  text-align: right;
+  font-family: "NunitoMedium";
+  font-size: 16px;
 
   > p {
-    max-width: 65%;
+    max-width: 80%;
     width: auto;
-    padding: 9px;
     color: #d7d7d7;
-    font-size: 14px;
+    font-size: 15px;
     text-align: left;
+    font-family: "NunitoMedium";
   }
 `;
 
-const UserName = styled.div`
+const OnUserName = styled.div`
+  position: absolute;
+  bottom: 2px;
+  left: 15px;
+  font-size: 30px;
+  z-index: 1;
+  font-family: "NunitoLight";
+`;
+
+const OffUserName = styled.div`
   position: absolute;
   font-size: calc(20px + 5vmin);
   z-index: 1;
+  font-family: "NunitoExtraBold";
 `;
 
 const FaIcon = styled.i`
