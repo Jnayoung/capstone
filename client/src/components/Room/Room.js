@@ -6,6 +6,7 @@ import STT from "stt.js";
 import VideoCard from "../Video/VideoCard";
 import BottomBar from "../BottomBar/BottomBar";
 import Chat from "../Chat/Chat";
+import Dialog from "../Dialog/Dialog";
 
 const Room = (props) => {
   const currentUser = sessionStorage.getItem("user");
@@ -13,9 +14,11 @@ const Room = (props) => {
   const [userVideoAudio, setUserVideoAudio] = useState({
     localUser: { video: true, audio: true },
   });
-  const [sender, setSender] = useState("anonymous");
+  const [sender, setSender] = useState();
   const [videoDevices, setVideoDevices] = useState([]);
-  const [audioDevices, setAudioDevices] = useState([]);
+  const [displayChat, setDisplayChat] = useState(false);
+  const [displaySub, setDisplaySub] = useState(false);
+  const [screenShare, setScreenShare] = useState(false);
   const [showVideoDevices, setShowVideoDevices] = useState(false);
   const peersRef = useRef([]);
   const userVideoRef = useRef();
@@ -28,11 +31,6 @@ const Room = (props) => {
     navigator.mediaDevices.enumerateDevices().then((devices) => {
       const filtered = devices.filter((device) => device.kind === "videoinput");
       setVideoDevices(filtered);
-    });
-
-    navigator.mediaDevices.enumerateDevices().then((devices) => {
-      const filtered = devices.filter((device) => device.kind === "audioinput");
-      setAudioDevices(filtered);
     });
 
     // Set Back Button Event
@@ -211,6 +209,18 @@ const Room = (props) => {
     }
   }
 
+  // Open Chat
+  const clickChat = (e) => {
+    e.stopPropagation();
+    setDisplayChat(!displayChat);
+  };
+
+  // Open Subtitle
+  const clickSubtitle = (e) => {
+    e.stopPropagation();
+    setDisplaySub(!displaySub);
+  };
+
   // BackButton
   const goToBack = (e) => {
     e.preventDefault();
@@ -234,23 +244,49 @@ const Room = (props) => {
   });
 
   const [finalScript, setFinalScript] = useState("");
+  const [previousFinalScript, setPreviousFinalScript] = useState("");
   const [interimScript, setinterimScript] = useState("");
-  stt.on("result", ({ finalTranscript, interimTranscript }) => {
-    console.log("result :>> ", finalTranscript, interimTranscript);
-    setSender(currentUser);
-    setinterimScript(interimTranscript);
-    setFinalScript(finalTranscript);
-    socket.emit("BE-stt-data-out", {
-      roomId,
-      ssender: currentUser,
-      smsg: finalScript,
-    });
-  });
 
-  socket.on("FE-stt-sender", ({ roomId, smsg, ssender }) => {
-    setSender(ssender);
-    setFinalScript(smsg);
-  });
+  useEffect(() => {
+    const handleSTTResult = ({ finalTranscript, interimTranscript }) => {
+      console.log("result :>> ", finalTranscript, interimTranscript);
+      setinterimScript(interimTranscript);
+      setFinalScript(finalTranscript);
+    };
+
+    // STT 이벤트 핸들러를 설정
+    stt.on("result", handleSTTResult);
+
+    return () => {
+      // 컴포넌트 언마운트 시 이벤트 핸들러 정리
+      stt.off("result", handleSTTResult);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (finalScript !== "" && finalScript !== previousFinalScript) {
+      socket.emit("BE-stt-data-out", {
+        roomId,
+        ssender: currentUser,
+        smsg: finalScript,
+        prev: previousFinalScript,
+      });
+      setPreviousFinalScript(finalScript);
+      console.log(finalScript);
+      setFinalScript("");
+    }
+  }, [finalScript, currentUser, roomId]);
+
+  const [getSub, setGetSub] = useState("");
+  // socket.on("FE-stt-sender", ({ roomId, smsg, ssender }) => {
+  //   console.log("get >>", ssender, smsg);
+  // })
+  useEffect(() => {
+    socket.on("FE-stt-sender", ({ ssender, smsg }) => {
+      setGetSub((msgs) => [...msgs, { ssender, smsg }]);
+      console.log("get >>", ssender, smsg);
+    });
+  }, []);
 
   // no-speech|audio-capture|not-allowed|not-supported-browser
   stt.on("error", (error) => {
@@ -301,6 +337,48 @@ const Room = (props) => {
       };
     });
     socket.emit("BE-toggle-camera-audio", { roomId, switchTarget: target });
+  };
+
+  const clickScreenSharing = () => {
+    if (!screenShare) {
+      navigator.mediaDevices
+        .getDisplayMedia({ cursor: true })
+        .then((stream) => {
+          const screenTrack = stream.getTracks()[0];
+
+          peersRef.current.forEach(({ peer }) => {
+            // replaceTrack (oldTrack, newTrack, oldStream);
+            peer.replaceTrack(
+              peer.streams[0]
+                .getTracks()
+                .find((track) => track.kind === "video"),
+              screenTrack,
+              userStream.current
+            );
+          });
+
+          // Listen click end
+          screenTrack.onended = () => {
+            peersRef.current.forEach(({ peer }) => {
+              peer.replaceTrack(
+                screenTrack,
+                peer.streams[0]
+                  .getTracks()
+                  .find((track) => track.kind === "video"),
+                userStream.current
+              );
+            });
+            userVideoRef.current.srcObject = userStream.current;
+            setScreenShare(false);
+          };
+
+          userVideoRef.current.srcObject = stream;
+          screenTrackRef.current = screenTrack;
+          setScreenShare(true);
+        });
+    } else {
+      screenTrackRef.current.onended();
+    }
   };
 
   const expandScreen = (e) => {
@@ -396,7 +474,11 @@ const Room = (props) => {
   return (
     <RoomContainer onClick={clickBackground}>
       <VideoAndChatContainer>
-        <Chat roomId={roomId} display={true} />
+        <Dialog
+          display={true}
+          finalTranscript={finalScript}
+          sender={currentUser}
+        />
         <VideoContainer>
           {/* Current User Video */}
           <VideoBox
@@ -421,20 +503,21 @@ const Room = (props) => {
             peers.map((peer, index, arr) => createUserVideo(peer, index, arr))}
           {
             <SmallTitle>
-              <strong>{sender}</strong>
+              <strong>{currentUser}</strong>
               <p ref={interimScriptRef}>{interimScript}</p>
             </SmallTitle>
           }
         </VideoContainer>
-
         <Chat roomId={roomId} display={true} />
       </VideoAndChatContainer>
 
       <BottomBar
+        clickScreenSharing={clickScreenSharing}
         clickCameraDevice={clickCameraDevice}
         goToBack={goToBack}
         toggleCameraAudio={toggleCameraAudio}
         userVideoAudio={userVideoAudio["localUser"]}
+        screenShare={screenShare}
         videoDevices={videoDevices}
         showVideoDevices={showVideoDevices}
         setShowVideoDevices={setShowVideoDevices}
@@ -461,7 +544,7 @@ const VideoAndChatContainer = styled.div`
   width: 88%;
   height: 83vh;
   background-color: white;
-  margin-bottom: 95px;
+  margin: 0px 80px 95px;
   padding: 10px;
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
@@ -469,14 +552,13 @@ const VideoAndChatContainer = styled.div`
 
 const VideoContainer = styled.div`
   display: flex;
-  flex: 3;
   position: relative;
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
   max-width: 100%;
-  width: 100vw;
-  height: 92%;
+  width: 65%;
+  height: 100%;
   padding: 5px;
   gap: 5px;
   box-sizing: border-box;
@@ -506,7 +588,8 @@ const VideoBox = styled.div`
 `;
 
 const SmallTitle = styled.div`
-  width: 80%;
+  width: 90%;
+  opacity: 0.8;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -533,9 +616,10 @@ const OnUserName = styled.div`
   position: absolute;
   bottom: 2px;
   left: 15px;
-  font-size: 30px;
+  font-size: 28px;
   z-index: 1;
-  font-family: "NunitoLight";
+  opacity: 0.9;
+  font-family: "NunitoMedium";
 `;
 
 const OffUserName = styled.div`

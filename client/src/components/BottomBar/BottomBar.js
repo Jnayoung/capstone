@@ -79,7 +79,6 @@ const BottomBar = ({
           마이크
         </CameraButton>
       </Center>
-      {/* <DownButton>Download</DownButton> */}
       <StopButton onClick={goToBack}>Stop</StopButton>
     </Bar>
   );
@@ -121,7 +120,6 @@ const PlusButton = styled.div`
   font-size: 25px;
   line-height: 20px;
   margin-right: 6px;
-  //background-color: #f6d365;
   background: linear-gradient(0deg, #f6d365 0%, #ffe9aa 100%);
 
   color: black;
@@ -201,9 +199,8 @@ const CameraButton = styled.div`
   margin-left: 15px;
 
   :hover {
-    background-color: #77b7dd;
+    opacity: 0.7;
     cursor: pointer;
-    border-radius: 15px;
   }
 
   * {
@@ -211,11 +208,11 @@ const CameraButton = styled.div`
   }
 
   .fa-microphone-slash {
-    color: #ee2560;
+    color: rgb(251, 33, 117);
   }
 
   .fa-video-slash {
-    color: #ee2560;
+    color: rgb(251, 33, 117);
   }
 `;
 
@@ -250,29 +247,6 @@ const SwitchList = styled.div`
   }
 `;
 
-// const DownButton = styled.div`
-//   width: 75px;
-//   height: 30px;
-//   border: none;
-//   font-size: 15px;
-//   line-height: 20px;
-//   margin-right: 15px;
-//   background-color: CornFlowerBlue;
-
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   padding: 3px 5px;
-//   outline: none;
-//   border-radius: 10px;
-//   font-family: "NunitoExtraBold";
-
-//   :hover {
-//     background-color: #f25483;
-//     cursor: pointer;
-//   }
-// `;
-
 const StopButton = styled.div`
   width: 75px;
   height: 30px;
@@ -297,7 +271,6 @@ const StopButton = styled.div`
   font-family: "NunitoExtraBold";
 
   cursor: pointer;
-  transition: all 0.2s ease;
   outline: none;
 
   :before {

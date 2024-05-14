@@ -73,6 +73,7 @@ const Body = styled.body`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  background-color: white;
 `;
 
 const H1 = styled.h1`

@@ -71,27 +71,31 @@ const Chat = ({ roomId }) => {
 
 const ChatContainer = styled.div`
   display: flex;
-  flex: 2;
   position: relative;
   flex-direction: column;
-  width: 30%;
+  width: 20%;
   height: 100%;
-  background-color: white;
+  background-color: whitesmoke;
   transition: all 0.5s ease;
+  border-radius: 10px;
+  padding: 0 10px;
+
   overflow: hidden;
 `;
 
-// const ChatContainer = styled.div`
-//   flex: 1;
-//   margin-left: 20px; // 비디오와 채팅 컨테이너 사이의 간격 조정
-// `;
-
 const TopHeader = styled.div`
   width: 100%;
-  margin-top: 15px;
-  font-weight: 600;
+  height: 8%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
   font-size: 20px;
   color: black;
+  font-family: "NunitoExtraBold";
+  background-color: white;
+  border: 1.3px solid #999999;
+  border-radius: 8px;
 `;
 
 const ChatArea = styled.div`
@@ -172,6 +176,7 @@ const BottomInput = styled.input`
   border-top: 1px solid rgb(69, 69, 82, 0.25);
   box-sizing: border-box;
   opacity: 0.7;
+  margin-bottom: 10px;
 
   :focus {
     outline: none;
