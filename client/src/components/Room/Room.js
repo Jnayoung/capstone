@@ -16,8 +16,6 @@ const Room = (props) => {
   });
   const [sender, setSender] = useState();
   const [videoDevices, setVideoDevices] = useState([]);
-  const [displayChat, setDisplayChat] = useState(false);
-  const [displaySub, setDisplaySub] = useState(false);
   const [screenShare, setScreenShare] = useState(false);
   const [showVideoDevices, setShowVideoDevices] = useState(false);
   const peersRef = useRef([]);
@@ -209,18 +207,6 @@ const Room = (props) => {
     }
   }
 
-  // Open Chat
-  const clickChat = (e) => {
-    e.stopPropagation();
-    setDisplayChat(!displayChat);
-  };
-
-  // Open Subtitle
-  const clickSubtitle = (e) => {
-    e.stopPropagation();
-    setDisplaySub(!displaySub);
-  };
-
   // BackButton
   const goToBack = (e) => {
     e.preventDefault();
@@ -270,6 +256,7 @@ const Room = (props) => {
         ssender: currentUser,
         smsg: finalScript,
         prev: previousFinalScript,
+        timestamp: new Date().toISOString(),
       });
       setPreviousFinalScript(finalScript);
       console.log(finalScript);
@@ -534,8 +521,8 @@ const RoomContainer = styled.div`
   justify-content: center;
   align-items: center;
   width: 100vw;
-  max-height: 100vh;
-  background-color: whitesmoke;
+  height: 100vh;
+  background: linear-gradient(to bottom, black, white);
 `;
 
 const VideoAndChatContainer = styled.div`

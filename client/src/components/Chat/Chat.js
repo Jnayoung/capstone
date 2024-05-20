@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import styled from "styled-components";
 import socket from "../../socket";
 
-const Chat = ({ roomId }) => {
+const Chat = ({ display, roomId }) => {
   const currentUser = sessionStorage.getItem("user");
   const [msg, setMsg] = useState([]);
   const messagesEndRef = useRef(null);
@@ -35,7 +35,7 @@ const Chat = ({ roomId }) => {
   };
 
   return (
-    <ChatContainer>
+    <ChatContainer className={display ? "" : "width0"}>
       <TopHeader>Chat</TopHeader>
       <ChatArea>
         <MessageList>
@@ -46,6 +46,17 @@ const Chat = ({ roomId }) => {
                   <Message key={idx}>
                     <strong>{sender}</strong>
                     <p>{msg}</p>
+                    <Timestamp
+                      style={{
+                        "margin-right": "auto",
+                      }}
+                    >
+                      {new Date().toLocaleString("ko-KR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      })}
+                    </Timestamp>
                   </Message>
                 );
               } else {
@@ -53,6 +64,17 @@ const Chat = ({ roomId }) => {
                   <UserMessage key={idx}>
                     <strong>{sender}</strong>
                     <p>{msg}</p>
+                    <Timestamp
+                      style={{
+                        "margin-left": "auto",
+                      }}
+                    >
+                      {new Date().toLocaleString("ko-KR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false,
+                      })}
+                    </Timestamp>
                   </UserMessage>
                 );
               }
@@ -68,6 +90,11 @@ const Chat = ({ roomId }) => {
     </ChatContainer>
   );
 };
+
+const Timestamp = styled.div`
+  font-size: 12px;
+  color: gray;
+`;
 
 const ChatContainer = styled.div`
   display: flex;
@@ -135,7 +162,7 @@ const Message = styled.div`
     margin-top: 3px;
     border: 1px solid rgb(78, 161, 211, 0.3);
     border-radius: 15px;
-    box-shadow: 0px 0px 3px #4ea1d3;
+    box-shadow: 0px 0px 3px black;
     font-size: 14px;
   }
 `;
@@ -161,7 +188,7 @@ const UserMessage = styled.div`
     margin-right: 30px;
     border: 1px solid rgb(78, 161, 211, 0.3);
     border-radius: 15px;
-    background-color: #4ea1d3;
+    background-color: black;
     color: white;
     font-size: 14px;
     text-align: left;

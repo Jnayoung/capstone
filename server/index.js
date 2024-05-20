@@ -8,6 +8,7 @@ const { send } = require("process");
 const { sensitiveHeaders } = require("http2");
 const { type } = require("os");
 const mongoose = require("mongoose");
+const { timeStamp } = require("console");
 
 let socketList = {};
 
@@ -134,27 +135,36 @@ io.on("connection", (socket) => {
   });
 
   let prevBuf = "";
-  socket.on("BE-stt-data-out", async ({ roomId, smsg, ssender, prev }) => {
-    prevBuf = prev;
-    let cleanMsg = smsg.replace(prevBuf, "");
-    console.log(`${roomId}번 방, ${ssender} : ${cleanMsg}`);
+  socket.on(
+    "BE-stt-data-out",
+    async ({ roomId, smsg, ssender, prev, timestamp }) => {
+      prevBuf = prev;
+      let cleanMsg = smsg.replace(prevBuf, "");
+      console.log(`${roomId}번 방, ${ssender} : ${cleanMsg}`);
 
-    // save form
-    const newNode = new Data({
-      roomId,
-      userName: ssender,
-      sttMsg: cleanMsg,
-    });
+      // save form
+      const newNode = new Data({
+        roomId,
+        userName: ssender,
+        sttMsg: cleanMsg,
+        timestamp: timestamp,
+      });
 
-    try {
-      await newNode.save();
-      console.log("데이터 저장 성공");
+      try {
+        await newNode.save();
+        console.log("데이터 저장 성공");
 
-      io.sockets.in(roomId).emit("FE-stt-sender", { smsg: cleanMsg, ssender });
-    } catch (err) {
-      console.log("데이터 저장 실패", err);
+        io.sockets
+          .in(roomId)
+          .emit("FE-stt-sender", { smsg: cleanMsg, ssender });
+        io.sockets
+          .in(roomId)
+          .emit("FE-stt-dialog", { smsg: cleanMsg, ssender, timestamp });
+      } catch (err) {
+        console.log("데이터 저장 실패", err);
+      }
     }
-  });
+  );
 });
 
 http.listen(PORT, () => {

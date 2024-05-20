@@ -1,38 +1,59 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
+import socket from "../../socket";
+import PropTypes from "prop-types";
 
-const Dialog = ({ display, finalTranscript, sender }) => {
-  const [transcripts, setTranscripts] = useState([]);
+const Dialog = ({ display }) => {
+  const [messages, setMessages] = useState([]); //subtitle 받아오는 변수
 
   useEffect(() => {
-    if (finalTranscript) {
-      // 새로운 finalTranscript 값을 이전 값과 함께 병합하여 새 배열로 업데이트
-      setTranscripts((prevTranscripts) => [
-        ...prevTranscripts,
-        finalTranscript,
-      ]);
-    }
-  }, [finalTranscript]);
+    socket.on("FE-stt-dialog", (data) => {
+      setMessages((prevMessages) => [...prevMessages, data]);
+    });
+
+    // 컴포넌트가 언마운트될 때 소켓 연결을 해제
+    return () => {
+      socket.off("FE-stt-dialog");
+    };
+  }, []);
 
   return (
     <DialogContainer style={{ display: display ? "block" : "none" }}>
       <DialogHeader>📁 Dialog 📁</DialogHeader>
-      {/* 최신 finalTranscript 값만 표시 */}
-      {transcripts.length > 0 && (
-        <FinalTranscriptContainer>
-          <div>{sender} : </div>
-          <p>{transcripts[transcripts.length - 1]}</p>
-        </FinalTranscriptContainer>
-      )}
+      <TranscriptList>
+        {messages.map((message, index) => (
+          <FinalTranscriptContainer key={index}>
+            <div>{message.ssender} :</div>
+            <p>{message.smsg}</p>
+            <Timestamp>
+              {new Date(message.timestamp).toLocaleString("ko-KR", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false,
+              })}
+            </Timestamp>
+          </FinalTranscriptContainer>
+        ))}
+      </TranscriptList>
       <SummaryButton>Summary</SummaryButton>
     </DialogContainer>
   );
 };
 
+Dialog.propTypes = {
+  display: PropTypes.bool.isRequired,
+};
+
+const Timestamp = styled.div`
+  margin-left: auto;
+  font-size: 12px;
+  color: gray;
+`;
+
 const DialogContainer = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
+  //justify-content: center;
   position: relative;
   flex-direction: column;
   width: 25%;
@@ -43,11 +64,6 @@ const DialogContainer = styled.div`
   overflow: hidden;
   padding: 0 10px;
 `;
-
-// const ChatContainer = styled.div`
-//   flex: 1;
-//   margin-left: 20px; // 비디오와 채팅 컨테이너 사이의 간격 조정
-// `;
 
 const DialogHeader = styled.div`
   width: 100%;
@@ -64,22 +80,27 @@ const DialogHeader = styled.div`
   border-radius: 8px;
 `;
 
+const TranscriptList = styled.div`
+  width: 100%;
+  height: calc(100% - 60px);
+  overflow-y: auto;
+  padding: 10px;
+`;
+
 const FinalTranscriptContainer = styled.div`
   display: flex;
-  flex-grow: 1;
   align-items: center;
-  margin: 30px 20px 0px;
+  margin: 10px;
   font-size: 15px;
   font-weight: 500;
 
   > div {
     font-family: "NunitoExtraBold";
     color: gray;
-    margin-right: 10px;
+    margin-right: 5px;
   }
 
   > p {
-    //font-size: 15px;
     margin-left: 5px;
     color: black;
   }
