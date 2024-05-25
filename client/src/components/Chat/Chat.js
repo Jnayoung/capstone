@@ -150,6 +150,7 @@ const Message = styled.div`
   margin-top: 15px;
   margin-left: 15px;
   text-align: left;
+  font-family: "NunitoMedium";
 
   > strong {
     margin-left: 3px;
@@ -175,6 +176,7 @@ const UserMessage = styled.div`
   font-size: 16px;
   margin-top: 15px;
   text-align: right;
+  font-family: "NunitoMedium";
 
   > strong {
     margin-right: 35px;
@@ -204,6 +206,7 @@ const BottomInput = styled.input`
   box-sizing: border-box;
   opacity: 0.7;
   margin-bottom: 10px;
+  font-family: "NunitoMedium";
 
   :focus {
     outline: none;
